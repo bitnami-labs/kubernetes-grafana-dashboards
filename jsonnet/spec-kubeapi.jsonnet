@@ -89,6 +89,24 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
             ||| % [metric.latency_threshold, runbook_url, alert.name],
           },
         },
+        blackbox: {
+          local alert = self,
+          name: 'KubeAPIUnHealthy',
+          expr: |||
+            probe_success{provider="kubernetes"} == 0
+          |||,
+          annotations: {
+            summary: 'Kube API is unhealthy',
+            description: |||
+              Issue: Kube API is not responding 200s from blackbox.monitoring
+              Playbook: %s#%s
+            ||| % [runbook_url, alert.name],
+          },
+          labels: {
+            notify_to: 'slack',
+            slack_channel: '#{{ $labels.team }}-alerts',
+          },
+        },
       },
     },
     kube_control_mgr: {

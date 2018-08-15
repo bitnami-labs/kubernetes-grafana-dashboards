@@ -39,6 +39,6 @@ golden-diff: $(PHONY_DIFF)
 golden/%.json: %.jsonnet
 	jsonnet $(<) > $(@)
 
-gen-golden: $(PHONY_GOLDEN)
+fix-golden: $(PHONY_GOLDEN)
 
 .PRECIOUS: %.jsonnet golden/%.json gen-golden

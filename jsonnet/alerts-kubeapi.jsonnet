@@ -25,8 +25,8 @@ local checks = [
       alert: check.name,
       expr: cleanupWhiteSpace(check.expr),
       'for': ALERTS_FOR,
-      labels: ALERTS_LABELS,
-      annotations: check.annotations,
+      labels+: ALERTS_LABELS,
+      annotations+: check.annotations,
     }
     for check in checks
   ],
