@@ -2,7 +2,6 @@ local spec = import 'spec-kubeapi.jsonnet';
 
 local ALERTS_NAME = 'kubeapi';
 local ALERTS_FOR = '15m';
-local ALERTS_LABELS = { severity: 'critical' };
 
 // Get rid of \n and duplicated whitespaces
 local cleanupWhiteSpace(str) = (
@@ -24,8 +23,8 @@ local checks = [
     {
       alert: check.name,
       expr: cleanupWhiteSpace(check.expr),
-      'for': ALERTS_FOR,
-      labels+: ALERTS_LABELS,
+      'for': check['for'],
+      labels+: check.labels,
       annotations+: check.annotations,
     }
     for check in checks

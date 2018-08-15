@@ -34,6 +34,10 @@
                   "summary": "Kube API 500s ratio is High"
                },
                "expr": "sum by (instance)(\n  rate(apiserver_request_count{verb!~\"(CONNECT|WATCH)\", code=~\"5..\"}[5m])\n) /\nsum by (instance)(\n  rate(apiserver_request_count[5m])\n) > 0.01\n",
+               "labels": {
+                  "notify_to": "slack",
+                  "slack_channel": "#{{ $labels.team }}-alerts"
+               },
                "name": "KubeAPIErrorRatioHigh"
             },
             "latency": {
@@ -42,6 +46,10 @@
                   "summary": "Kube API Latency is High"
                },
                "expr": "histogram_quantile (\n  0.90,\n  sum by (le, instance)(\n    rate(apiserver_request_latencies_bucket{verb!~\"(CONNECT|WATCH)\"}[5m])\n  )\n) / 1e3 > 200\n",
+               "labels": {
+                  "notify_to": "slack",
+                  "slack_channel": "#{{ $labels.team }}-alerts"
+               },
                "name": "KubeAPILatencyHigh"
             }
          },
@@ -73,6 +81,10 @@
                   "summary": "Kube Control Manager workqueue processing is slow"
                },
                "expr": "sum by (instance)(\n  APIServiceRegistrationController_work_duration{quantile=\"0.9\"}\n) > 100\n",
+               "labels": {
+                  "notify_to": "slack",
+                  "slack_channel": "#{{ $labels.team }}-alerts"
+               },
                "name": "KubeControllerWorkDurationHigh"
             }
          },
@@ -95,6 +107,10 @@
                   "summary": "Etcd Latency is High"
                },
                "expr": "max by (instance)(\n  rate(etcd_request_latencies_summary{job=\"kubernetes_apiservers\",quantile=\"0.9\"}[5m]) < Inf\n)/ 1e3 > 20\n",
+               "labels": {
+                  "notify_to": "slack",
+                  "slack_channel": "#{{ $labels.team }}-alerts"
+               },
                "name": "KubeEtcdLatencyHigh"
             }
          },
@@ -108,6 +124,14 @@
             }
          },
          "name": "Kube Etcd"
+      }
+   },
+   "prometheus": {
+      "alerts_common": {
+         "labels": {
+            "notify_to": "slack",
+            "slack_channel": "#{{ $labels.team }}-alerts"
+         }
       }
    }
 }
