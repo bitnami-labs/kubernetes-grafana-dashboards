@@ -22,9 +22,11 @@
                   "summary": "Kube API is unhealthy"
                },
                "expr": "probe_success{provider=\"kubernetes\"} == 0\n",
+               "for": "5m",
                "labels": {
                   "notify_to": "slack",
-                  "slack_channel": "#{{ $labels.team }}-alerts"
+                  "severity": "critical",
+                  "slack_channel": "#sre-alerts"
                },
                "name": "KubeAPIUnHealthy"
             },
@@ -34,9 +36,11 @@
                   "summary": "Kube API 500s ratio is High"
                },
                "expr": "sum by (instance)(\n  rate(apiserver_request_count{verb!~\"(CONNECT|WATCH)\", code=~\"5..\"}[5m])\n) /\nsum by (instance)(\n  rate(apiserver_request_count[5m])\n) > 0.01\n",
+               "for": "5m",
                "labels": {
                   "notify_to": "slack",
-                  "slack_channel": "#{{ $labels.team }}-alerts"
+                  "severity": "critical",
+                  "slack_channel": "#sre-alerts"
                },
                "name": "KubeAPIErrorRatioHigh"
             },
@@ -46,9 +50,11 @@
                   "summary": "Kube API Latency is High"
                },
                "expr": "histogram_quantile (\n  0.90,\n  sum by (le, instance)(\n    rate(apiserver_request_latencies_bucket{verb!~\"(CONNECT|WATCH)\"}[5m])\n  )\n) / 1e3 > 200\n",
+               "for": "5m",
                "labels": {
                   "notify_to": "slack",
-                  "slack_channel": "#{{ $labels.team }}-alerts"
+                  "severity": "critical",
+                  "slack_channel": "#sre-alerts"
                },
                "name": "KubeAPILatencyHigh"
             }
@@ -81,9 +87,11 @@
                   "summary": "Kube Control Manager workqueue processing is slow"
                },
                "expr": "sum by (instance)(\n  APIServiceRegistrationController_work_duration{quantile=\"0.9\"}\n) > 100\n",
+               "for": "5m",
                "labels": {
                   "notify_to": "slack",
-                  "slack_channel": "#{{ $labels.team }}-alerts"
+                  "severity": "critical",
+                  "slack_channel": "#sre-alerts"
                },
                "name": "KubeControllerWorkDurationHigh"
             }
@@ -107,9 +115,11 @@
                   "summary": "Etcd Latency is High"
                },
                "expr": "max by (instance)(\n  rate(etcd_request_latencies_summary{job=\"kubernetes_apiservers\",quantile=\"0.9\"}[5m]) < Inf\n)/ 1e3 > 20\n",
+               "for": "5m",
                "labels": {
                   "notify_to": "slack",
-                  "slack_channel": "#{{ $labels.team }}-alerts"
+                  "severity": "critical",
+                  "slack_channel": "#sre-alerts"
                },
                "name": "KubeEtcdLatencyHigh"
             }
@@ -128,9 +138,11 @@
    },
    "prometheus": {
       "alerts_common": {
+         "for": "5m",
          "labels": {
             "notify_to": "slack",
-            "slack_channel": "#{{ $labels.team }}-alerts"
+            "severity": "critical",
+            "slack_channel": "#sre-alerts"
          }
       }
    }
