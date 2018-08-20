@@ -34,7 +34,7 @@
             {
                "alert": "KubeAPILatencyHigh",
                "annotations": {
-                  "description": "Issue: Kube API Latency on {{ $labels.instance }} is above 200: {{ $value }}\nPlaybook: https://engineering-handbook.nami.run/sre/runbooks/kubeapi#KubeAPILatencyHigh\n",
+                  "description": "Issue: Kube API Latency on {{ $labels.instance }} is above 200 ms: {{ $value }}\nPlaybook: https://engineering-handbook.nami.run/sre/runbooks/kubeapi#KubeAPILatencyHigh\n",
                   "summary": "Kube API Latency is High"
                },
                "expr": "histogram_quantile ( 0.90, sum by (le, instance)( rate(apiserver_request_latencies_bucket{verb!~\"(CONNECT|WATCH)\"}[5m]) ) ) / 1e3 > 200",
@@ -62,10 +62,10 @@
             {
                "alert": "KubeEtcdLatencyHigh",
                "annotations": {
-                  "description": "Issue: Kube Etcd latency on {{ $labels.instance }} above 20: {{ $value }}\nPlaybook: https://engineering-handbook.nami.run/sre/runbooks/kubeapi#KubeEtcdLatencyHigh\n",
+                  "description": "Issue: Kube Etcd latency on {{ $labels.instance }} above 1000 ms: {{ $value }}\nPlaybook: https://engineering-handbook.nami.run/sre/runbooks/kubeapi#KubeEtcdLatencyHigh\n",
                   "summary": "Etcd Latency is High"
                },
-               "expr": "max by (instance)( rate(etcd_request_latencies_summary{job=\"kubernetes_apiservers\",quantile=\"0.9\"}[5m]) < Inf )/ 1e3 > 20",
+               "expr": "max by (instance)( etcd_request_latencies_summary{job=\"kubernetes_apiservers\",quantile=\"0.9\"} )/ 1e3 > 1000",
                "for": "5m",
                "labels": {
                   "notify_to": "slack",

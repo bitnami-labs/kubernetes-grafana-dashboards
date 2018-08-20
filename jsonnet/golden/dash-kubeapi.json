@@ -348,7 +348,7 @@
                "targets": [
                   {
                      "datasource": "$datasource",
-                     "expr": "max by (operation, instance)(\n  rate(etcd_request_latencies_summary{job=\"kubernetes_apiservers\",quantile=\"0.9\"}[5m]) < Inf\n)/ 1e3\n",
+                     "expr": "max by (operation, instance)(\n  etcd_request_latencies_summary{job=\"kubernetes_apiservers\",quantile=\"0.9\"}\n)/ 1e3\n",
                      "format": "time_series",
                      "intervalFactor": 2,
                      "legendFormat": "{{ instance }} - {{ operation }}",
@@ -361,7 +361,7 @@
                      "fill": true,
                      "line": true,
                      "op": "gt",
-                     "value": 20
+                     "value": 1000
                   }
                ],
                "timeFrom": null,

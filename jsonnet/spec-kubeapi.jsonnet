@@ -94,7 +94,7 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
           annotations: {
             summary: 'Kube API Latency is High',
             description: |||
-              Issue: Kube API Latency on {{ $labels.instance }} is above %s: {{ $value }}
+              Issue: Kube API Latency on {{ $labels.instance }} is above %s ms: {{ $value }}
               Playbook: %s#%s
             ||| % [metric.latency_threshold, runbook_url, alert.name],
           },
@@ -152,14 +152,14 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
     },
     kube_etcd: {
       local metric = self,
-      etcd_latency_threshold: 20,
+      etcd_latency_threshold: 1000,
       name: 'Kube Etcd',
       graphs: {
         latency: {
           title: 'etcd 90th latency[ms] by (operation, instance)',
           formula: |||
             max by (operation, instance)(
-              rate(etcd_request_latencies_summary{job="kubernetes_apiservers",quantile="0.9"}[5m]) < Inf
+              etcd_request_latencies_summary{job="kubernetes_apiservers",quantile="0.9"}
             )/ 1e3
           |||,
           legend: '{{ instance }} - {{ operation }}',
@@ -172,13 +172,13 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
           name: 'KubeEtcdLatencyHigh',
           expr: |||
             max by (instance)(
-              rate(etcd_request_latencies_summary{job="kubernetes_apiservers",quantile="0.9"}[5m]) < Inf
+              etcd_request_latencies_summary{job="kubernetes_apiservers",quantile="0.9"}
             )/ 1e3 > %s
           ||| % [metric.etcd_latency_threshold],
           annotations: {
             summary: 'Etcd Latency is High',
             description: |||
-              Issue: Kube Etcd latency on {{ $labels.instance }} above %s: {{ $value }}
+              Issue: Kube Etcd latency on {{ $labels.instance }} above %s ms: {{ $value }}
               Playbook: %s#%s
             ||| % [metric.etcd_latency_threshold, runbook_url, alert.name],
           },
