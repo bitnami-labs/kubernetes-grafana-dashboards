@@ -1,7 +1,7 @@
 {
    "groups": [
       {
-         "name": "kubeapi",
+         "name": "kubeapi_alerts",
          "rules": [
             {
                "alert": "KubeAPIUnHealthy",

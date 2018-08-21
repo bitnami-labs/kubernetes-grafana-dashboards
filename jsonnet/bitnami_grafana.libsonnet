@@ -17,9 +17,18 @@ local prometheus = grafana.prometheus;
           grafana.template.datasource( 'datasource', 'prometheus', 'Prometheus')
         )
   },
-  panel:: {
-    new(title):: self + graphPanel.new(
-      title,
+  default_type(p):: (
+      if std.objectHas(p, "type") then p.type else "graph"
+  ),
+  default_span(p):: (
+      if std.objectHas(p, "span") then p.span else 12
+  ),
+  default_format(p):: (
+      if std.objectHas(p, "format") then p.format else "none"
+  ),
+  graph:: {
+    new(p):: self + graphPanel.new(
+      p.title,
       datasource='$datasource',
       legend_values=true,
       legend_max=true,
@@ -29,8 +38,33 @@ local prometheus = grafana.prometheus;
       legend_rightSide=true,
       legend_sort='max',
       legend_sortDesc=true,
+      span=$.default_span(p),
+    ) {
+      thresholds: [$.threshold_gt(p.threshold)]
+    },
+  },
+
+  singlestat:: {
+    new(p):: self + singlestat.new(
+      p.title,
+      datasource='$datasource',
+      span=$.default_span(p),
+      format=$.default_format(p),
+      valueName='current',
+    ) {
+      thresholds: p.threshold,
+    }
+  },
+
+  panel:: {
+    new(p):: (
+      {
+        graph: $.graph.new,
+        singlestat: $.singlestat.new,
+      }[$.default_type(p)](p)
     ),
   },
+
   prom(expr, legend):: self + prometheus.target(
     expr, datasource='$datasource', legendFormat=legend
   ),

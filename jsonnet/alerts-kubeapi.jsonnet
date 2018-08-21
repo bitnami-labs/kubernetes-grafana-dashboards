@@ -1,6 +1,6 @@
 local spec = import 'spec-kubeapi.jsonnet';
 
-local ALERTS_NAME = 'kubeapi';
+local ALERTS_NAME = 'kubeapi_alerts';
 local ALERTS_FOR = '15m';
 
 // Get rid of \n and duplicated whitespaces

@@ -16,13 +16,178 @@
          "height": "250px",
          "panels": [
             {
+               "cacheTimeout": null,
+               "colorBackground": false,
+               "colorValue": false,
+               "colors": [
+                  "#299c46",
+                  "rgba(237, 129, 40, 0.89)",
+                  "#d44a3a"
+               ],
+               "datasource": "$datasource",
+               "format": "percentunit",
+               "gauge": {
+                  "maxValue": 100,
+                  "minValue": 0,
+                  "show": false,
+                  "thresholdLabels": false,
+                  "thresholdMarkers": true
+               },
+               "id": 2,
+               "interval": null,
+               "links": [ ],
+               "mappingType": 1,
+               "mappingTypes": [
+                  {
+                     "name": "value to text",
+                     "value": 1
+                  },
+                  {
+                     "name": "range to text",
+                     "value": 2
+                  }
+               ],
+               "maxDataPoints": 100,
+               "nullPointMode": "connected",
+               "nullText": null,
+               "postfix": "",
+               "postfixFontSize": "50%",
+               "prefix": "",
+               "prefixFontSize": "50%",
+               "rangeMaps": [
+                  {
+                     "from": "null",
+                     "text": "N/A",
+                     "to": "null"
+                  }
+               ],
+               "span": 2,
+               "sparkline": {
+                  "fillColor": "rgba(31, 118, 189, 0.18)",
+                  "full": false,
+                  "lineColor": "rgb(31, 120, 193)",
+                  "show": false
+               },
+               "tableColumn": "",
+               "targets": [
+                  {
+                     "datasource": "$datasource",
+                     "expr": "sum_over_time(kubernetes::job:slo_kube_api_ok[$availability_span]) / sum_over_time(kubernetes::job:slo_kube_api_sample[$availability_span])\n",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "{{ job }}"
+                  }
+               ],
+               "thresholds": "0.99",
+               "title": "SLO: Availaibility over $availability_span",
+               "type": "singlestat",
+               "valueFontSize": "80%",
+               "valueMaps": [
+                  {
+                     "op": "=",
+                     "text": "N/A",
+                     "value": "null"
+                  }
+               ],
+               "valueName": "current"
+            },
+            {
                "aliasColors": { },
                "bars": false,
                "dashLength": 10,
                "dashes": false,
                "datasource": "$datasource",
                "fill": 1,
-               "id": 2,
+               "id": 3,
+               "legend": {
+                  "alignAsTable": true,
+                  "avg": true,
+                  "current": true,
+                  "max": true,
+                  "min": false,
+                  "rightSide": true,
+                  "show": true,
+                  "sort": "max",
+                  "sortDesc": true,
+                  "total": false,
+                  "values": true
+               },
+               "lines": true,
+               "linewidth": 1,
+               "links": [ ],
+               "nullPointMode": "null",
+               "percentage": false,
+               "pointradius": 5,
+               "points": false,
+               "renderer": "flot",
+               "repeat": null,
+               "seriesOverrides": [ ],
+               "spaceLength": 10,
+               "span": 10,
+               "stack": false,
+               "steppedLine": false,
+               "targets": [
+                  {
+                     "datasource": "$datasource",
+                     "expr": "sum_over_time(kubernetes::job:slo_kube_api_ok[10m]) / sum_over_time(kubernetes::job:slo_kube_api_sample[10m])\n",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "{{ job }}",
+                     "refId": "A"
+                  }
+               ],
+               "thresholds": [
+                  {
+                     "colorMode": "critical",
+                     "fill": true,
+                     "line": true,
+                     "op": "gt",
+                     "value": "0.99"
+                  }
+               ],
+               "timeFrom": null,
+               "timeShift": null,
+               "title": "SLO: Availaibility over 10m",
+               "tooltip": {
+                  "shared": true,
+                  "sort": 0,
+                  "value_type": "individual"
+               },
+               "type": "graph",
+               "xaxis": {
+                  "buckets": null,
+                  "mode": "time",
+                  "name": null,
+                  "show": true,
+                  "values": [ ]
+               },
+               "yaxes": [
+                  {
+                     "format": "short",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": null,
+                     "show": true
+                  },
+                  {
+                     "format": "short",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": null,
+                     "show": true
+                  }
+               ]
+            },
+            {
+               "aliasColors": { },
+               "bars": false,
+               "dashLength": 10,
+               "dashes": false,
+               "datasource": "$datasource",
+               "fill": 1,
+               "id": 4,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -111,7 +276,7 @@
                "dashes": false,
                "datasource": "$datasource",
                "fill": 1,
-               "id": 3,
+               "id": 5,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -214,7 +379,7 @@
                "dashes": false,
                "datasource": "$datasource",
                "fill": 1,
-               "id": 4,
+               "id": 6,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -317,7 +482,7 @@
                "dashes": false,
                "datasource": "$datasource",
                "fill": 1,
-               "id": 5,
+               "id": 7,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -458,6 +623,43 @@
                }
             ],
             "query": "50, 90, 99",
+            "refresh": 0,
+            "type": "custom"
+         },
+         {
+            "allValue": null,
+            "current": {
+               "text": "1d",
+               "value": "1d"
+            },
+            "hide": 0,
+            "includeAll": false,
+            "label": "",
+            "multi": false,
+            "name": "availability_span",
+            "options": [
+               {
+                  "text": "10m",
+                  "value": "10m"
+               },
+               {
+                  "text": "1h",
+                  "value": "1h"
+               },
+               {
+                  "text": "1d",
+                  "value": "1d"
+               },
+               {
+                  "text": "7d",
+                  "value": "7d"
+               },
+               {
+                  "text": "1m",
+                  "value": "1m"
+               }
+            ],
+            "query": "10m,1h,1d,7d,1m",
             "refresh": 0,
             "type": "custom"
          },

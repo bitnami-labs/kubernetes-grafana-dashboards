@@ -24,10 +24,10 @@ bitgraf.dash.new(
 .addRows([
   row.new(height='250px', title=x.title)
   .addPanels([
-    bitgraf.panel.new(p.title)
+    bitgraf.panel.new(p)
     .addTarget(
       bitgraf.prom(p.formula, p.legend)
-    ) { thresholds: [bitgraf.threshold_gt(p.threshold)] }
+    )
     for p in x.panels
   ])
   for x in rows

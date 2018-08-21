@@ -2,15 +2,16 @@ SHELL=/bin/bash
 DATE=$(shell date -I)
 OUT_GRAFANA=out/grafana
 OUT_PROMETHEUS=out/prometheus
-DASH_TARGETS=$(patsubst %.jsonnet, $(OUT_GRAFANA)/%.json, $(wildcard dash*.jsonnet))
+GRAFANA_TARGETS=$(patsubst %.jsonnet, $(OUT_GRAFANA)/%.json, $(wildcard dash*.jsonnet))
 ALERT_TARGETS=$(patsubst %.jsonnet, $(OUT_PROMETHEUS)/%.rules.yml, $(wildcard alert*.jsonnet))
+RULES_TARGETS=$(patsubst %.jsonnet, $(OUT_PROMETHEUS)/%.rules.yml, $(wildcard rules*.jsonnet))
 
 ALL_JSONNET=$(wildcard *.jsonnet)
 
 PHONY_GOLDEN=$(patsubst %.jsonnet,golden/%.json,$(ALL_JSONNET))
 PHONY_DIFF=$(patsubst %.jsonnet,%.diff,$(ALL_JSONNET))
 
-all: $(DASH_TARGETS) $(ALERT_TARGETS)
+all: $(GRAFANA_TARGETS) $(ALERT_TARGETS) $(RULES_TARGETS)
 
 test: test-fmt golden-diff
 
@@ -21,7 +22,7 @@ fix-fmt:
 	for i in $(ALL_JSONNET); do jsonnet fmt -i $$i;done
 
 clean:
-	rm -f $(DASH_TARGETS) $(ALERT_TARGETS)
+	rm -f $(GRAFANA_TARGETS) $(ALERT_TARGETS) $(RULES_TARGETS)
 
 $(OUT_PROMETHEUS)/%.rules.yml: $(OUT_PROMETHEUS)/%.json
 	@mkdir -p out/prometheus
