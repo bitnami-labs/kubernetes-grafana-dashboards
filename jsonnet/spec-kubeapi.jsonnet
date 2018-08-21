@@ -13,8 +13,8 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
   grafana: {
     templates_custom: {
       availability_span: {
-        values: '10m,1h,1d,7d,1m',
-        default: '1d',
+        values: '10m,1h,1d,7d,30d,90d',
+        default: '7d',
         hide: '',
       },
       api_percentile: {
@@ -32,7 +32,7 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
   metrics: {
     kube_api: {
       local metric = self,
-      verb_excl: '(CONNECT|WATCH)',
+      verb_excl: '(CONNECT|WATCH|PROXY)',
       api_percentile: '90',
       error_ratio_threshold: 0.01,
       latency_threshold: 200,

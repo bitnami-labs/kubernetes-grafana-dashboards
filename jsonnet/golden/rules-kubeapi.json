@@ -11,21 +11,21 @@
                "record": "kubernetes::job:apiserver_request_errors:ratio_rate5m"
             },
             {
-               "expr": "sum by (job, instance)( rate(apiserver_request_count{verb!~\"(CONNECT|WATCH)\", code=~\"5..\"}[5m])) /sum by (job, instance)( rate(apiserver_request_count[5m]))",
+               "expr": "sum by (job, instance)( rate(apiserver_request_count{verb!~\"(CONNECT|WATCH|PROXY)\", code=~\"5..\"}[5m])) /sum by (job, instance)( rate(apiserver_request_count[5m]))",
                "labels": {
                   "job": "kubernetes_api_slo"
                },
                "record": "kubernetes::job_instance:apiserver_request_errors:ratio_rate5m"
             },
             {
-               "expr": "histogram_quantile ( 0.90, sum by (le, job)( rate(apiserver_request_latencies_bucket{verb!~\"(CONNECT|WATCH)\"}[5m]) )) / 1e3",
+               "expr": "histogram_quantile ( 0.90, sum by (le, job)( rate(apiserver_request_latencies_bucket{verb!~\"(CONNECT|WATCH|PROXY)\"}[5m]) )) / 1e3",
                "labels": {
                   "job": "kubernetes_api_slo"
                },
                "record": "kubernetes::job:apiserver_latency:pctl90rate5m"
             },
             {
-               "expr": "histogram_quantile ( 0.90, sum by (le, job, instance)( rate(apiserver_request_latencies_bucket{verb!~\"(CONNECT|WATCH)\"}[5m]) )) / 1e3",
+               "expr": "histogram_quantile ( 0.90, sum by (le, job, instance)( rate(apiserver_request_latencies_bucket{verb!~\"(CONNECT|WATCH|PROXY)\"}[5m]) )) / 1e3",
                "labels": {
                   "job": "kubernetes_api_slo"
                },

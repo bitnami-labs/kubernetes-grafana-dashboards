@@ -23,7 +23,7 @@
                   "description": "Issue: Kube API Error ratio on {{ $labels.instance }} is above 0.01: {{ $value }}\nPlaybook: https://engineering-handbook.nami.run/sre/runbooks/kubeapi#KubeAPIErrorRatioHigh\n",
                   "summary": "Kube API 500s ratio is High"
                },
-               "expr": "sum by (instance)( rate(apiserver_request_count{verb!~\"(CONNECT|WATCH)\", code=~\"5..\"}[5m]) ) / sum by (instance)( rate(apiserver_request_count[5m]) ) > 0.01",
+               "expr": "sum by (instance)( rate(apiserver_request_count{verb!~\"(CONNECT|WATCH|PROXY)\", code=~\"5..\"}[5m]) ) / sum by (instance)( rate(apiserver_request_count[5m]) ) > 0.01",
                "for": "5m",
                "labels": {
                   "notify_to": "slack",
@@ -37,7 +37,7 @@
                   "description": "Issue: Kube API Latency on {{ $labels.instance }} is above 200 ms: {{ $value }}\nPlaybook: https://engineering-handbook.nami.run/sre/runbooks/kubeapi#KubeAPILatencyHigh\n",
                   "summary": "Kube API Latency is High"
                },
-               "expr": "histogram_quantile ( 0.90, sum by (le, instance)( rate(apiserver_request_latencies_bucket{verb!~\"(CONNECT|WATCH)\"}[5m]) ) ) / 1e3 > 200",
+               "expr": "histogram_quantile ( 0.90, sum by (le, instance)( rate(apiserver_request_latencies_bucket{verb!~\"(CONNECT|WATCH|PROXY)\"}[5m]) ) ) / 1e3 > 200",
                "for": "5m",
                "labels": {
                   "notify_to": "slack",

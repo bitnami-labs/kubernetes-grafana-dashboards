@@ -629,8 +629,8 @@
          {
             "allValue": null,
             "current": {
-               "text": "1d",
-               "value": "1d"
+               "text": "7d",
+               "value": "7d"
             },
             "hide": 0,
             "includeAll": false,
@@ -655,19 +655,23 @@
                   "value": "7d"
                },
                {
-                  "text": "1m",
-                  "value": "1m"
+                  "text": "30d",
+                  "value": "30d"
+               },
+               {
+                  "text": "90d",
+                  "value": "90d"
                }
             ],
-            "query": "10m,1h,1d,7d,1m",
+            "query": "10m,1h,1d,7d,30d,90d",
             "refresh": 0,
             "type": "custom"
          },
          {
             "allValue": null,
             "current": {
-               "text": "(CONNECT|WATCH)",
-               "value": "(CONNECT|WATCH)"
+               "text": "(CONNECT|WATCH|PROXY)",
+               "value": "(CONNECT|WATCH|PROXY)"
             },
             "hide": 2,
             "includeAll": false,
@@ -676,11 +680,11 @@
             "name": "verb_excl",
             "options": [
                {
-                  "text": "(CONNECT|WATCH)",
-                  "value": "(CONNECT|WATCH)"
+                  "text": "(CONNECT|WATCH|PROXY)",
+                  "value": "(CONNECT|WATCH|PROXY)"
                }
             ],
-            "query": "(CONNECT|WATCH)",
+            "query": "(CONNECT|WATCH|PROXY)",
             "refresh": 0,
             "type": "custom"
          }
