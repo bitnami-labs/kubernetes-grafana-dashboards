@@ -218,7 +218,7 @@
                "targets": [
                   {
                      "datasource": "$datasource",
-                     "expr": "sum by (verb, code)(\n  rate(apiserver_request_count{verb!~\"$verb_excl\", code=~\"5..\"}[5m])\n) / ignoring(code) group_left\nsum by (verb)(\n  rate(apiserver_request_count[5m])\n)\n",
+                     "expr": "sum by (job, verb, code)(kubernetes:job_verb_code_instance:apiserver_requests:ratio_rate5m{verb!~\"(CONNECT|WATCH|PROXY)\", code=~\"5..\"})",
                      "format": "time_series",
                      "intervalFactor": 2,
                      "legendFormat": "{{ verb }} - {{ code }}",
@@ -307,7 +307,7 @@
                "targets": [
                   {
                      "datasource": "$datasource",
-                     "expr": "histogram_quantile (\n  0.$api_percentile,\n  sum by (le, verb)(\n    rate(apiserver_request_latencies_bucket{verb!~\"$verb_excl\"}[5m])\n  )\n) / 1e3 > 0\n",
+                     "expr": "kubernetes:job_verb:apiserver_latency:pctl90rate5m{verb!~\"$verb_excl\"}",
                      "format": "time_series",
                      "intervalFactor": 2,
                      "legendFormat": "{{ verb }}",

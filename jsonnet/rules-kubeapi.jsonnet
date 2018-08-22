@@ -6,7 +6,7 @@ local RULES_NAME = 'kubeapi_rules';
 local cleanupWhiteSpace(str) = (
   std.join(' ', [
     x
-    for x in std.split(std.strReplace(str, '\n', ''), ' ')
+    for x in std.split(std.strReplace(str, '\n', ' '), ' ')
     if x != ''
   ])
 );
