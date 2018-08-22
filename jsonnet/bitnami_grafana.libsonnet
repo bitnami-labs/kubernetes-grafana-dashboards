@@ -20,12 +20,6 @@ local prometheus = grafana.prometheus;
   default_type(p):: (
       if std.objectHas(p, "type") then p.type else "graph"
   ),
-  default_span(p):: (
-      if std.objectHas(p, "span") then p.span else 12
-  ),
-  default_format(p):: (
-      if std.objectHas(p, "format") then p.format else "none"
-  ),
   graph:: {
     new(p):: self + graphPanel.new(
       p.title,
@@ -35,10 +29,8 @@ local prometheus = grafana.prometheus;
       legend_current=true,
       legend_avg=true,
       legend_alignAsTable=true,
-      legend_rightSide=true,
       legend_sort='max',
       legend_sortDesc=true,
-      span=$.default_span(p),
     ) {
       thresholds: [$.threshold_gt(p.threshold)]
     },
@@ -48,8 +40,6 @@ local prometheus = grafana.prometheus;
     new(p):: self + singlestat.new(
       p.title,
       datasource='$datasource',
-      span=$.default_span(p),
-      format=$.default_format(p),
       valueName='current',
     ) {
       thresholds: p.threshold,
@@ -62,7 +52,7 @@ local prometheus = grafana.prometheus;
         graph: $.graph.new,
         singlestat: $.singlestat.new,
       }[$.default_type(p)](p)
-    ),
+    ) + (if std.objectHas(p, "extra") then p.extra else {})
   },
 
   prom(expr, legend):: self + prometheus.target(

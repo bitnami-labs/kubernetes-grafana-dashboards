@@ -18,7 +18,7 @@ local rows = [
 ];
 
 bitgraf.dash.new(
-  'SLA: Kubernetes API',
+  'SLO: Kubernetes API',
   tags=['k8s', 'api', 'sla']
 )
 .addRows([

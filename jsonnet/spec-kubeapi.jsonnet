@@ -12,6 +12,9 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
     },
   },
   grafana: {
+    common: {
+      extra+: { legend+: { rightSide: true } },
+    },
     templates_custom: {
       availability_span: {
         values: '10m,1h,1d,7d,30d,90d',
@@ -48,8 +51,8 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
       // We're explicitly excluding these verbs from graphing because they tend to be spiky:
       // - WATCH: API exported metrics show steady 8secs, guess it's so by implementation
       // - CONNECT, PROXY: depend on control-plane -> nodes connectivity
-      verb_excl:: '(CONNECT|WATCH|PROXY)',
-      verb_slos:: '(GET|POST|DELETE|PATCH)',
+      verb_excl:: 'CONNECT|WATCH|PROXY',
+      verb_slos:: 'GET|POST|DELETE|PATCH',
       api_percentile:: '90',
       error_ratio_threshold:: 0.01,
       latency_threshold:: 200,
@@ -57,42 +60,53 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
       graphs: {
         // Singlestat showing the service availabilty (%) over selectable $availability_span
         // (grafana template variable)
-        availability_1: {
+        aa_availability_1: $.grafana.common {
           title: 'SLO: Availaibility over $availability_span',
           type: 'singlestat',
-          format: 'percentunit',
-          span: 2,
           legend: '{{ job }}',
           formula: |||
             sum_over_time(%s[$availability_span]) / sum_over_time(%s[$availability_span])
           ||| % [metric.rules.slo_ok.record, metric.rules.slo_sample.record],
           threshold: '0.99',
+          extra: { span: 2, format: 'percentunit', legend+: { rightSide: false } },
         },
         // Graph showing fixed short-span service availabilty ([10m])
-        availability_2: {
+        ab_availability_2: $.grafana.common {
           title: 'SLO: Availaibility over 10m',
-          span: 10,
+          legend_rightSide: false,
           legend: '{{ job }}',
           formula: |||
             sum_over_time(%s[10m]) / sum_over_time(%s[10m])
           ||| % [metric.rules.slo_ok.record, metric.rules.slo_sample.record],
           threshold: '0.99',
+          extra: { span: 4 },
         },
-        // Graph showing 500s except $verb_excl (hidden dashboard variable)
-        error_ratio: {
-          title: 'API Error ratio 500s/total (except $verb_excl)',
-          formula: 'sum by (job, verb, code)(%s{verb!~"%s", code=~"5.."})' % [
+        // Graph showing 500s except `verb_excl`
+        ac_error_ratio: $.grafana.common {
+          title: 'API Error ratio 500s/total (except %s)' % [metric.verb_excl],
+          formula: 'sum by (job, verb, code, instance)(%s{verb!~"%s", code=~"5.."})' % [
             metric.rules.requests_ratiorate_job_verb_code_instance.record,
             metric.verb_excl,
           ],
-          legend: '{{ verb }} - {{ code }}',
+          legend: '{{ verb }} - {{ code }} - {{ instance }}',
           threshold: metric.error_ratio_threshold,
+          extra: { span: 6 },
         },
-        // Graph showing latency except $verb_excl (hidden dashboard variable)
-        latency: {
-          title: 'API $api_percentile-th latency[ms] by verb (except $verb_excl)',
-          formula: '%s{verb!~"$verb_excl"}' % [metric.rules.latency_job_verb.record],
-          legend: '{{ verb }}',
+        // Graph showing all requests ratios
+        ba_req_ratio: $.grafana.common {
+          title: 'API requests ratios',
+          formula: metric.rules.requests_ratiorate_job_verb_code.record,
+          legend: '{{ verb }} - {{ code }}',
+          threshold: 1e9,
+        },
+        // Graph showing latency except `verb_excl`
+        ca_latency: $.grafana.common {
+          title: 'API $api_percentile-th latency[ms] by verb (except %s)' % [metric.verb_excl],
+          formula: '%s{verb!~"%s"}' % [
+            metric.rules.latency_job_verb_instance.record,
+            metric.verb_excl,
+          ],
+          legend: '{{ verb }} - {{ instance }}',
           threshold: metric.latency_threshold,
         },
       },
@@ -275,7 +289,7 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
       work_duration_limit: 100,
       name: 'Kube Control Manager',
       graphs: {
-        work_duration: {
+        work_duration: $.grafana.common {
           title: 'Kube Control Manager work duration',
           formula: |||
             sum by (instance)(
@@ -311,7 +325,7 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
       etcd_latency_threshold: 1000,
       name: 'Kube Etcd',
       graphs: {
-        latency: {
+        latency: $.grafana.common {
           title: 'etcd 90th latency[ms] by (operation, instance)',
           formula: |||
             max by (operation, instance)(
