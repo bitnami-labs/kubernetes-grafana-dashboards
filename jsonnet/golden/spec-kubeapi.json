@@ -16,7 +16,7 @@
          "availability_span": {
             "default": "7d",
             "hide": "",
-            "values": "10m,1h,1d,7d,30d,90d"
+            "values": "10m,1h,1d,7d,21d,30d,90d"
          },
          "verb_excl": {
             "default": "CONNECT|WATCH|PROXY",
@@ -72,23 +72,40 @@
             }
          },
          "graphs": {
-            "aa_availability_1": {
+            "aa_availability": {
                "extra": {
                   "format": "percentunit",
                   "legend": {
                      "rightSide": false
                   },
-                  "span": 2
+                  "span": 2,
+                  "valueFontSize": "80%"
                },
                "formula": "sum_over_time(kubernetes::job:slo_kube_api_ok[$availability_span]) / sum_over_time(kubernetes::job:slo_kube_api_sample[$availability_span])\n",
                "legend": "{{ job }}",
                "threshold": "0.99",
-               "title": "SLO: Availaibility over $availability_span",
+               "title": "Availability over $availability_span",
                "type": "singlestat"
             },
-            "ab_availability_2": {
+            "ab_availability": {
                "extra": {
-                  "span": 4
+                  "decimals": 2,
+                  "format": "s",
+                  "legend": {
+                     "rightSide": false
+                  },
+                  "span": 2,
+                  "valueFontSize": "80%"
+               },
+               "formula": "scalar((sum_over_time(kubernetes::job:slo_kube_api_ok[$availability_span]) / sum_over_time(kubernetes::job:slo_kube_api_sample[$availability_span]) - 0.98999999999999999)) * scalar((time() - timestamp(up{job=\"prometheus\"} offset $availability_span)))\n",
+               "legend": "{{ job }}",
+               "threshold": "0.99",
+               "title": "Budget remaining from $availability_span",
+               "type": "singlestat"
+            },
+            "ac_availability": {
+               "extra": {
+                  "span": 2
                },
                "formula": "sum_over_time(kubernetes::job:slo_kube_api_ok[10m]) / sum_over_time(kubernetes::job:slo_kube_api_sample[10m])\n",
                "legend": "{{ job }}",
@@ -96,14 +113,14 @@
                "threshold": "0.99",
                "title": "SLO: Availaibility over 10m"
             },
-            "ac_error_ratio": {
+            "ad_error_ratio": {
                "extra": {
                   "span": 6
                },
-               "formula": "sum by (job, verb, code, instance)(kubernetes:job_verb_code_instance:apiserver_requests:ratio_rate5m{verb!~\"CONNECT|WATCH|PROXY\", code=~\"5..\"})",
+               "formula": "sum by (job, verb, code, instance)(kubernetes:job_verb_code_instance:apiserver_requests:ratio_rate5m{verb!~\"CONNECT|WATCH|PROXY\", code!~\"2..\"})",
                "legend": "{{ verb }} - {{ code }} - {{ instance }}",
                "threshold": 0.01,
-               "title": "API Error ratio 500s/total (except CONNECT|WATCH|PROXY)"
+               "title": "API non-200s/total ratio (except CONNECT|WATCH|PROXY)"
             },
             "ba_req_ratio": {
                "extra": {
@@ -286,5 +303,8 @@
             "slack_channel": "#sre-alerts"
          }
       }
+   },
+   "slo": {
+      "target": 0.98999999999999999
    }
 }

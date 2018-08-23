@@ -82,7 +82,87 @@
                   }
                ],
                "thresholds": "0.99",
-               "title": "SLO: Availaibility over $availability_span",
+               "title": "Availability over $availability_span",
+               "type": "singlestat",
+               "valueFontSize": "80%",
+               "valueMaps": [
+                  {
+                     "op": "=",
+                     "text": "N/A",
+                     "value": "null"
+                  }
+               ],
+               "valueName": "current"
+            },
+            {
+               "cacheTimeout": null,
+               "colorBackground": false,
+               "colorValue": false,
+               "colors": [
+                  "#299c46",
+                  "rgba(237, 129, 40, 0.89)",
+                  "#d44a3a"
+               ],
+               "datasource": "$datasource",
+               "decimals": 2,
+               "format": "s",
+               "gauge": {
+                  "maxValue": 100,
+                  "minValue": 0,
+                  "show": false,
+                  "thresholdLabels": false,
+                  "thresholdMarkers": true
+               },
+               "id": 3,
+               "interval": null,
+               "legend": {
+                  "rightSide": false
+               },
+               "links": [ ],
+               "mappingType": 1,
+               "mappingTypes": [
+                  {
+                     "name": "value to text",
+                     "value": 1
+                  },
+                  {
+                     "name": "range to text",
+                     "value": 2
+                  }
+               ],
+               "maxDataPoints": 100,
+               "nullPointMode": "connected",
+               "nullText": null,
+               "postfix": "",
+               "postfixFontSize": "50%",
+               "prefix": "",
+               "prefixFontSize": "50%",
+               "rangeMaps": [
+                  {
+                     "from": "null",
+                     "text": "N/A",
+                     "to": "null"
+                  }
+               ],
+               "span": 2,
+               "sparkline": {
+                  "fillColor": "rgba(31, 118, 189, 0.18)",
+                  "full": false,
+                  "lineColor": "rgb(31, 120, 193)",
+                  "show": false
+               },
+               "tableColumn": "",
+               "targets": [
+                  {
+                     "datasource": "$datasource",
+                     "expr": "scalar((sum_over_time(kubernetes::job:slo_kube_api_ok[$availability_span]) / sum_over_time(kubernetes::job:slo_kube_api_sample[$availability_span]) - 0.98999999999999999)) * scalar((time() - timestamp(up{job=\"prometheus\"} offset $availability_span)))\n",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "{{ job }}"
+                  }
+               ],
+               "thresholds": "0.99",
+               "title": "Budget remaining from $availability_span",
                "type": "singlestat",
                "valueFontSize": "80%",
                "valueMaps": [
@@ -101,7 +181,7 @@
                "dashes": false,
                "datasource": "$datasource",
                "fill": 1,
-               "id": 3,
+               "id": 4,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -126,7 +206,7 @@
                "repeat": null,
                "seriesOverrides": [ ],
                "spaceLength": 10,
-               "span": 4,
+               "span": 2,
                "stack": false,
                "steppedLine": false,
                "targets": [
@@ -190,7 +270,7 @@
                "dashes": false,
                "datasource": "$datasource",
                "fill": 1,
-               "id": 4,
+               "id": 5,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -221,7 +301,7 @@
                "targets": [
                   {
                      "datasource": "$datasource",
-                     "expr": "sum by (job, verb, code, instance)(kubernetes:job_verb_code_instance:apiserver_requests:ratio_rate5m{verb!~\"CONNECT|WATCH|PROXY\", code=~\"5..\"})",
+                     "expr": "sum by (job, verb, code, instance)(kubernetes:job_verb_code_instance:apiserver_requests:ratio_rate5m{verb!~\"CONNECT|WATCH|PROXY\", code!~\"2..\"})",
                      "format": "time_series",
                      "intervalFactor": 2,
                      "legendFormat": "{{ verb }} - {{ code }} - {{ instance }}",
@@ -239,7 +319,7 @@
                ],
                "timeFrom": null,
                "timeShift": null,
-               "title": "API Error ratio 500s/total (except CONNECT|WATCH|PROXY)",
+               "title": "API non-200s/total ratio (except CONNECT|WATCH|PROXY)",
                "tooltip": {
                   "shared": true,
                   "sort": 0,
@@ -279,7 +359,7 @@
                "dashes": false,
                "datasource": "$datasource",
                "fill": 1,
-               "id": 5,
+               "id": 6,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -368,7 +448,7 @@
                "dashes": false,
                "datasource": "$datasource",
                "fill": 1,
-               "id": 6,
+               "id": 7,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -471,7 +551,7 @@
                "dashes": false,
                "datasource": "$datasource",
                "fill": 1,
-               "id": 7,
+               "id": 8,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -574,7 +654,7 @@
                "dashes": false,
                "datasource": "$datasource",
                "fill": 1,
-               "id": 8,
+               "id": 9,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -747,6 +827,10 @@
                   "value": "7d"
                },
                {
+                  "text": "21d",
+                  "value": "21d"
+               },
+               {
                   "text": "30d",
                   "value": "30d"
                },
@@ -755,7 +839,7 @@
                   "value": "90d"
                }
             ],
-            "query": "10m,1h,1d,7d,30d,90d",
+            "query": "10m,1h,1d,7d,21d,30d,90d",
             "refresh": 0,
             "type": "custom"
          },

@@ -1,6 +1,9 @@
 local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi';
 {
   // General settings
+  slo: {
+    target: 0.99,
+  },
   prometheus: {
     alerts_common: {
       labels: {
@@ -17,7 +20,8 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
     },
     templates_custom: {
       availability_span: {
-        values: '10m,1h,1d,7d,30d,90d',
+        // NOTE: will depend on prometheus retention time
+        values: '10m,1h,1d,7d,21d,30d,90d',
         default: '7d',
         hide: '',
       },
@@ -60,31 +64,50 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
       graphs: {
         // Singlestat showing the service availabilty (%) over selectable $availability_span
         // (grafana template variable)
-        aa_availability_1: $.grafana.common {
-          title: 'SLO: Availaibility over $availability_span',
+        aa_availability: $.grafana.common {
+          title: 'Availability over $availability_span',
           type: 'singlestat',
           legend: '{{ job }}',
           formula: |||
             sum_over_time(%s[$availability_span]) / sum_over_time(%s[$availability_span])
           ||| % [metric.rules.slo_ok.record, metric.rules.slo_sample.record],
-          threshold: '0.99',
-          extra: { span: 2, format: 'percentunit', legend+: { rightSide: false } },
+          threshold: '%.2f' % $.slo.target,
+          extra: { span: 2, format: 'percentunit', valueFontSize: '80%', legend+: { rightSide: false } },
+        },
+        // Singlestat showing time budget remaining from the selected $availability_span
+        ab_availability: $.grafana.common {
+          title: 'Budget remaining from $availability_span',
+          type: 'singlestat',
+          legend: '{{ job }}',
+          // time remaining: (<availability_ratio> - <target>) * <time_period_secs>
+          // <time_period_secs> is calculated as:
+          //    current time() - timestamp(<any_metric offseted by time_period>)
+          formula: |||
+            scalar((sum_over_time(%s[$availability_span]) / sum_over_time(%s[$availability_span]) - %s)) * 
+              scalar((time() - timestamp(up{job="prometheus"} offset $availability_span)))
+          ||| % [
+            metric.rules.slo_ok.record,
+            metric.rules.slo_sample.record,
+            $.slo.target,
+          ],
+          threshold: '%.2f' % $.slo.target,
+          extra: { span: 2, format: 's', decimals: 2, valueFontSize: '80%', legend+: { rightSide: false } },
         },
         // Graph showing fixed short-span service availabilty ([10m])
-        ab_availability_2: $.grafana.common {
+        ac_availability: $.grafana.common {
           title: 'SLO: Availaibility over 10m',
           legend_rightSide: false,
           legend: '{{ job }}',
           formula: |||
             sum_over_time(%s[10m]) / sum_over_time(%s[10m])
           ||| % [metric.rules.slo_ok.record, metric.rules.slo_sample.record],
-          threshold: '0.99',
-          extra: { span: 4 },
+          threshold: '%.2f' % $.slo.target,
+          extra: { span: 2 },
         },
         // Graph showing 500s except `verb_excl`
-        ac_error_ratio: $.grafana.common {
-          title: 'API Error ratio 500s/total (except %s)' % [metric.verb_excl],
-          formula: 'sum by (job, verb, code, instance)(%s{verb!~"%s", code=~"5.."})' % [
+        ad_error_ratio: $.grafana.common {
+          title: 'API non-200s/total ratio (except %s)' % [metric.verb_excl],
+          formula: 'sum by (job, verb, code, instance)(%s{verb!~"%s", code!~"2.."})' % [
             metric.rules.requests_ratiorate_job_verb_code_instance.record,
             metric.verb_excl,
           ],
