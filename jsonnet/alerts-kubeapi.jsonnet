@@ -29,7 +29,7 @@ local checks = [
   // See https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/
   groups: [
     {
-      name: "%s_alerts" % spec.name,
+      name: '%s_alerts' % spec.name,
       rules: $.rules,
     },
   ],

@@ -25,7 +25,7 @@ local rules = [
   // See https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/
   groups: [
     {
-      name: "%s_rules" % spec.name,
+      name: '%s_rules' % spec.name,
       rules: $.rules,
     },
   ],

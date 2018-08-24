@@ -1,7 +1,7 @@
 local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi';
 {
   // General settings
-  name:: "kubeapi",
+  name:: 'kubeapi',
   slo:: {
     target: 0.99,
   },
