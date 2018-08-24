@@ -1,10 +1,11 @@
 local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi';
 {
   // General settings
-  slo: {
+  name:: "kubeapi",
+  slo:: {
     target: 0.99,
   },
-  prometheus: {
+  prometheus:: {
     alerts_common: {
       labels: {
         notify_to: 'slack',
@@ -14,7 +15,9 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
       'for': '5m',
     },
   },
-  grafana: {
+  grafana:: {
+    title: 'SLO: Kubernetes API',
+    tags: ['k8s', 'api', 'sla'],
     common: {
       extra+: { legend+: { rightSide: true } },
     },
@@ -47,7 +50,7 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
   // Pseudo convention, re: rules prefixes:
   // 'kubernetes:<...>'  normal recorded rule
   // 'kubernetes::<...>' ditto above, also intended to be federated, matching '.+::.+' regex
-  metrics: {
+  metrics:: {
     kube_api: {
       // General (opinionated) settings for this metric
       local metric = self,

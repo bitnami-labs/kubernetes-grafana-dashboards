@@ -1,8 +1,5 @@
 local spec = import 'spec-kubeapi.jsonnet';
 
-local ALERTS_NAME = 'kubeapi_alerts';
-local ALERTS_FOR = '15m';
-
 // Get rid of \n and duplicated whitespaces
 local cleanupWhiteSpace(str) = (
   std.join(' ', [
@@ -32,7 +29,7 @@ local checks = [
   // See https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/
   groups: [
     {
-      name: ALERTS_NAME,
+      name: "%s_alerts" % spec.name,
       rules: $.rules,
     },
   ],

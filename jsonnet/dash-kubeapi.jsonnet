@@ -17,10 +17,7 @@ local rows = [
   for m_key in std.objectFields(spec.metrics)
 ];
 
-bitgraf.dash.new(
-  'SLO: Kubernetes API',
-  tags=['k8s', 'api', 'sla']
-)
+bitgraf.dash.new(spec.grafana.title, tags=spec.grafana.tags)
 .addRows([
   row.new(height='250px', title=x.title)
   .addPanels([

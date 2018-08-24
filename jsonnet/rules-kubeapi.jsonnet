@@ -1,7 +1,5 @@
 local spec = import 'spec-kubeapi.jsonnet';
 
-local RULES_NAME = 'kubeapi_rules';
-
 // Get rid of \n and duplicated whitespaces
 local cleanupWhiteSpace(str) = (
   std.join(' ', [
@@ -27,7 +25,7 @@ local rules = [
   // See https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/
   groups: [
     {
-      name: RULES_NAME,
+      name: "%s_rules" % spec.name,
       rules: $.rules,
     },
   ],
