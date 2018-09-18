@@ -348,7 +348,7 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
     },
     kube_etcd: {
       local metric = self,
-      etcd_latency_threshold: 1000,
+      etcd_latency_threshold: 2000,
       name: 'Kube Etcd',
       graphs: {
         latency: $.grafana.common {
