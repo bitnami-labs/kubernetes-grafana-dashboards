@@ -4,6 +4,9 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
   name:: 'kubeapi',
   slo:: {
     target: 0.99,
+    error_ratio_threshold: 0.01,
+    latency_percentile: 90,
+    latency_threshold: 200,
   },
   prometheus:: {
     alerts_common: {
@@ -30,7 +33,7 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
       },
       api_percentile: {
         values: '50, 90, 99',
-        default: $.metrics.kube_api.api_percentile,
+        default: '%s' % [$.slo.latency_percentile],
         hide: '',
       },
       verb_excl: {
@@ -60,9 +63,6 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
       // - CONNECT, PROXY: depend on control-plane -> nodes connectivity
       verb_excl:: 'CONNECT|WATCH|PROXY',
       verb_slos:: 'GET|POST|DELETE|PATCH',
-      api_percentile:: '90',
-      error_ratio_threshold:: 0.01,
-      latency_threshold:: 200,
       name:: 'Kube API',
       graphs: {
         // Singlestat showing the service availabilty (%) over selectable $availability_span
@@ -115,7 +115,7 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
             metric.verb_excl,
           ],
           legend: '{{ verb }} - {{ code }} - {{ instance }}',
-          threshold: metric.error_ratio_threshold,
+          threshold: $.slo.error_ratio_threshold,
           extra: { span: 6 },
         },
         // Graph showing all requests ratios
@@ -133,7 +133,7 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
             metric.verb_excl,
           ],
           legend: '{{ verb }} - {{ instance }}',
-          threshold: metric.latency_threshold,
+          threshold: $.slo.latency_threshold,
         },
       },
       alerts: {
@@ -144,14 +144,14 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
           expr: 'sum by (instance)(%s{verb=~"%s", code=~"5.."}) > %s' % [
             metric.rules.requests_ratiorate_job_verb_code_instance.record,
             metric.verb_slos,
-            metric.error_ratio_threshold,
+            $.slo.error_ratio_threshold,
           ],
           annotations: {
             summary: 'Kube API 500s ratio is High',
             description: |||
               Issue: Kube API Error ratio on {{ $labels.instance }} is above %s: {{ $value }}
               Playbook: %s#%s
-            ||| % [metric.error_ratio_threshold, runbook_url, alert.name],
+            ||| % [$.slo.error_ratio_threshold, runbook_url, alert.name],
           },
         },
         // Alert on 500s ratio above chosen `error_ratio_threshold` for `verb_slos`
@@ -161,14 +161,14 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
           expr: 'max by (instance)(%s{verb=~"%s"}) > %s' % [
             metric.rules.latency_job_verb_instance.record,
             metric.verb_slos,
-            metric.latency_threshold,
+            $.slo.latency_threshold,
           ],
           annotations: {
             summary: 'Kube API Latency is High',
             description: |||
               Issue: Kube API Latency on {{ $labels.instance }} is above %s ms: {{ $value }}
               Playbook: %s#%s
-            ||| % [metric.latency_threshold, runbook_url, alert.name],
+            ||| % [$.slo.latency_threshold, runbook_url, alert.name],
           },
         },
         blackbox: $.prometheus.alerts_common {
@@ -232,7 +232,7 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
 
         // Useful for dashboards: job, verb, instance
         latency_job_verb_instance: self.common {
-          record: 'kubernetes:job_verb_instance:apiserver_latency:pctl%srate5m' % metric.api_percentile,
+          record: 'kubernetes:job_verb_instance:apiserver_latency:pctl%srate5m' % $.slo.latency_percentile,
           expr: |||
             histogram_quantile (
               0.%s,
@@ -240,11 +240,11 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
                 rate(apiserver_request_latencies_bucket[5m])
               )
             ) / 1e3
-          ||| % [metric.api_percentile],
+          ||| % [$.slo.latency_percentile],
         },
         // Useful for alerting: job, verb
         latency_job_verb: self.common {
-          record: 'kubernetes:job_verb:apiserver_latency:pctl%srate5m' % metric.api_percentile,
+          record: 'kubernetes:job_verb:apiserver_latency:pctl%srate5m' % $.slo.latency_percentile,
           expr: |||
             histogram_quantile (
               0.%s,
@@ -252,12 +252,12 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
                 rate(apiserver_request_latencies_bucket[5m])
               )
             ) / 1e3 > 0
-          ||| % [metric.api_percentile],
+          ||| % [$.slo.latency_percentile],
         },
 
         // Useful for SLO and long-term views: job (only for `verb_slos`)
         slo_latency_job: self.common {
-          record: 'kubernetes::job:apiserver_latency:pctl%srate5m' % metric.api_percentile,
+          record: 'kubernetes::job:apiserver_latency:pctl%srate5m' % $.slo.latency_percentile,
           expr: |||
             histogram_quantile (
               0.%s,
@@ -265,7 +265,7 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
                 rate(apiserver_request_latencies_bucket{verb=~"%s"}[5m])
               )
             ) / 1e3
-          ||| % [metric.api_percentile, metric.verb_slos],
+          ||| % [$.slo.latency_percentile, metric.verb_slos],
         },
         probe_success: self.common {
           record: 'kubernetes::job:probe_success',
@@ -293,9 +293,9 @@ local runbook_url = 'https://engineering-handbook.nami.run/sre/runbooks/kubeapi'
             %s < bool %s * %s < bool %s
           ||| % [
             metric.rules.slo_errors_ratiorate_job.record,
-            metric.error_ratio_threshold,
+            $.slo.error_ratio_threshold,
             metric.rules.slo_latency_job.record,
-            metric.latency_threshold,
+            $.slo.latency_threshold,
           ],
         },
         // metric always evaluating to 1 (with same labels as above)
