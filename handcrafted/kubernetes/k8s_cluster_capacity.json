@@ -881,7 +881,7 @@
             "target": ""
           },
           {
-            "expr": "sum(node_load5) by (node) / count(node_cpu_seconds_total{mode=\"system\"}) by (node)",
+            "expr": "sum(node_load15) by (node) / count(node_cpu_seconds_total{mode=\"system\"}) by (node)",
             "format": "time_series",
             "hide": false,
             "intervalFactor": 4,
