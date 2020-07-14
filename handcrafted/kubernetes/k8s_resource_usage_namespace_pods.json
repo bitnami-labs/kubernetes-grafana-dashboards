@@ -92,11 +92,11 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "topk($top, sum(rate(container_cpu_usage_seconds_total{kubernetes_io_role=\"$role\",namespace=~\"$namespace\",pod_name=~\"$pod_name.*\",container_name=~\"$container_name\"}[$_interval])) without (cpu)) > 1e-3",
+              "expr": "topk($top, sum(rate(container_cpu_usage_seconds_total{namespace=~\"$namespace\",pod=~\"$pod.*\",container=~\"$container\"}[$_interval])) without (cpu)) > 1e-3",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "{{cluster}} - {{ pod_name }}/{{ container_name }}",
+              "legendFormat": "{{cluster}} - {{ pod }}/{{ container }}",
               "metric": "container_cpu_usage_seconds_total",
               "refId": "A",
               "step": 60
@@ -105,7 +105,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "top$top container CPU usage  for ns=\"$namespace\" (pod_name=\"$pod_name\",container_name=\"$container_name\")",
+          "title": "top$top container CPU usage  for ns=\"$namespace\" (pod=\"$pod\",container=\"$container\")",
           "tooltip": {
             "shared": true,
             "sort": 2,
@@ -174,11 +174,11 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "topk($top, container_memory_working_set_bytes{kubernetes_io_role=\"$role\",namespace=~\"$namespace\",pod_name=~\"$pod_name.*\",container_name=~\"$container_name\"})",
+              "expr": "topk($top, container_memory_working_set_bytes{namespace=~\"$namespace\",pod=~\"$pod.*\",container=~\"$container\"})",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "{{cluster}} - {{ pod_name }}/{{ container_name }}",
+              "legendFormat": "{{cluster}} - {{ pod }}/{{ container }}",
               "metric": "container_memory_rss",
               "refId": "A",
               "step": 60
@@ -187,7 +187,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "top$top container MEM usage  for ns=\"$namespace\" (pod_name=\"$pod_name\",container_name=\"$container_name\")",
+          "title": "top$top container MEM usage  for ns=\"$namespace\" (pod=\"$pod\",container=\"$container\")",
           "tooltip": {
             "shared": true,
             "sort": 2,
@@ -268,20 +268,20 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "topk($top, sum(rate(container_fs_reads_bytes_total{kubernetes_io_role=\"$role\",namespace=~\"$namespace\",pod_name=~\"$pod_name.*\",container_name=~\"$container_name\"}[$_interval])) without (cpu)) > 0",
+              "expr": "topk($top, sum(rate(container_fs_reads_bytes_total{namespace=~\"$namespace\",pod=~\"$pod.*\",container=~\"$container\"}[$_interval])) without (cpu)) > 0",
               "format": "time_series",
               "hide": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "{{cluster}} - {{ pod_name }}/{{ container_name }}",
+              "legendFormat": "{{cluster}} - {{ pod }}/{{ container }}",
               "refId": "A",
               "step": 4
             },
             {
-              "expr": "- topk($top, sum(rate(container_fs_writes_bytes_total{kubernetes_io_role=\"$role\",namespace=~\"$namespace\",pod_name=~\"$pod_name.*\",container_name=~\"$container_name\"}[$_interval])) without (cpu)) < 0",
+              "expr": "- topk($top, sum(rate(container_fs_writes_bytes_total{namespace=~\"$namespace\",pod=~\"$pod.*\",container=~\"$container\"}[$_interval])) without (cpu)) < 0",
               "format": "time_series",
               "intervalFactor": 2,
-              "legendFormat": "{{cluster}} - {{ pod_name }}/{{ container_name }}",
+              "legendFormat": "{{cluster}} - {{ pod }}/{{ container }}",
               "refId": "B",
               "step": 4
             }
@@ -289,7 +289,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "top$top container IO +R -W for ns=\"$namespace\" (pod_name=\"$pod_name\",container_name=\"$container_name\") [bytes/sec]",
+          "title": "top$top container IO +R -W for ns=\"$namespace\" (pod=\"$pod\",container=\"$container\") [bytes/sec]",
           "tooltip": {
             "shared": true,
             "sort": 1,
@@ -358,20 +358,20 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "topk($top, sum(rate(container_fs_reads_total{kubernetes_io_role=\"$role\",namespace=~\"$namespace\",pod_name=~\"$pod_name.*\",container_name=~\"$container_name\"}[$_interval])) without (cpu)) > 0",
+              "expr": "topk($top, sum(rate(container_fs_reads_total{namespace=~\"$namespace\",pod=~\"$pod.*\",container=~\"$container\"}[$_interval])) without (cpu)) > 0",
               "format": "time_series",
               "hide": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "{{cluster}} - {{ pod_name}}/{{ container_name }}",
+              "legendFormat": "{{cluster}} - {{ pod}}/{{ container }}",
               "refId": "A",
               "step": 4
             },
             {
-              "expr": "- topk($top, sum(rate(container_fs_writes_total{kubernetes_io_role=\"$role\",namespace=~\"$namespace\",pod_name=~\"$pod_name.*\",container_name=~\"$container_name\"}[$_interval])) without (cpu)) < 0",
+              "expr": "- topk($top, sum(rate(container_fs_writes_total{namespace=~\"$namespace\",pod=~\"$pod.*\",container=~\"$container\"}[$_interval])) without (cpu)) < 0",
               "format": "time_series",
               "intervalFactor": 2,
-              "legendFormat": "{{cluster}} - {{ pod_name}}/{{ container_name }}",
+              "legendFormat": "{{cluster}} - {{ pod}}/{{ container }}",
               "refId": "B",
               "step": 4
             }
@@ -379,7 +379,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "top$top container IO +R -W ns=\"$namespace\" (pod_name=\"$pod_name\",container_name=\"$container_name\") [iops]",
+          "title": "top$top container IO +R -W ns=\"$namespace\" (pod=\"$pod\",container=\"$container\") [iops]",
           "tooltip": {
             "shared": true,
             "sort": 1,
@@ -460,20 +460,20 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "topk($top, sum(rate(container_network_receive_bytes_total{kubernetes_io_role=\"$role\",namespace=~\"$namespace\",pod_name=~\"$pod_name.*\"}[$_interval])) without (cpu)) > 0",
+              "expr": "topk($top, sum(rate(container_network_receive_bytes_total{namespace=~\"$namespace\",pod=~\"$pod.*\"}[$_interval])) without (cpu)) > 0",
               "format": "time_series",
               "hide": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "{{cluster}} - {{ pod_name}}",
+              "legendFormat": "{{cluster}} - {{ pod}}",
               "refId": "A",
               "step": 4
             },
             {
-              "expr": "- topk($top, sum(rate(container_network_transmit_bytes_total{kubernetes_io_role=\"$role\",namespace=~\"$namespace\",container_name=~\"$container_name\",pod_name=~\"$pod_name.*\"}[$_interval])) without (cpu)) < 0",
+              "expr": "- topk($top, sum(rate(container_network_transmit_bytes_total{namespace=~\"$namespace\",container=~\"$container\",pod=~\"$pod.*\"}[$_interval])) without (cpu)) < 0",
               "format": "time_series",
               "intervalFactor": 2,
-              "legendFormat": "{{cluster}} - {{ pod_name}}",
+              "legendFormat": "{{cluster}} - {{ pod}}",
               "refId": "B",
               "step": 4
             }
@@ -481,7 +481,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "top$top Pod Network +RX -TX ns=\"$namespace\" (pod_name=\"$pod_name\") [Bytes/sec]",
+          "title": "top$top Pod Network +RX -TX ns=\"$namespace\" (pod=\"$pod\") [Bytes/sec]",
           "tooltip": {
             "shared": true,
             "sort": 1,
@@ -550,21 +550,21 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "topk($top, sum(rate(container_network_receive_packets_total{kubernetes_io_role=\"$role\",namespace=~\"$namespace\",pod_name=~\"$pod_name.*\"}[$_interval])) without (cpu)) > 0",
+              "expr": "topk($top, sum(rate(container_network_receive_packets_total{namespace=~\"$namespace\",pod=~\"$pod.*\"}[$_interval])) without (cpu)) > 0",
               "format": "time_series",
               "hide": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "{{cluster}} - {{ pod_name }}",
+              "legendFormat": "{{cluster}} - {{ pod }}",
               "refId": "A",
               "step": 4
             },
             {
-              "expr": "- topk($top, sum(rate(container_network_transmit_packets_total{kubernetes_io_role=\"$role\",namespace=~\"$namespace\",pod_name=~\"$pod_name.*\"}[$_interval])) without (cpu)) < 0",
+              "expr": "- topk($top, sum(rate(container_network_transmit_packets_total{namespace=~\"$namespace\",pod=~\"$pod.*\"}[$_interval])) without (cpu)) < 0",
               "format": "time_series",
               "hide": false,
               "intervalFactor": 2,
-              "legendFormat": "{{cluster}} - {{ pod_name }}",
+              "legendFormat": "{{cluster}} - {{ pod }}",
               "refId": "B",
               "step": 4
             }
@@ -572,7 +572,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "top$top Pod Network +RX -TX ns=\"$namespace\" (pod_name=\"$pod_name\") [pkts/sec]",
+          "title": "top$top Pod Network +RX -TX ns=\"$namespace\" (pod=\"$pod\") [pkts/sec]",
           "tooltip": {
             "shared": true,
             "sort": 1,
@@ -633,26 +633,6 @@
         "refresh": 1,
         "regex": "",
         "type": "datasource"
-      },
-      {
-        "allValue": null,
-        "current": {},
-        "datasource": "$datasource",
-        "hide": 2,
-        "includeAll": false,
-        "label": null,
-        "multi": false,
-        "name": "role",
-        "options": [],
-        "query": "up{kubernetes_io_role!=\"\"}",
-        "refresh": 1,
-        "regex": "/.*kubernetes_io_role=\"(.+)\".*/",
-        "sort": 0,
-        "tagValuesQuery": "",
-        "tags": [],
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
       },
       {
         "allValue": null,
@@ -719,7 +699,7 @@
         "includeAll": true,
         "label": "pod",
         "multi": false,
-        "name": "pod_name",
+        "name": "pod",
         "options": [],
         "query": "kube_pod_container_status_running",
         "refresh": 1,
@@ -739,7 +719,7 @@
         "includeAll": true,
         "label": "container",
         "multi": false,
-        "name": "container_name",
+        "name": "container",
         "options": [],
         "query": "kube_pod_container_status_running",
         "refresh": 1,
@@ -856,5 +836,5 @@
   },
   "timezone": "",
   "title": "Kubernetes resource usage per namespace and pod",
-  "version": 4
+  "version": 5
 }
